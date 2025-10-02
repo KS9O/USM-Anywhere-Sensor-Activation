@@ -1,95 +1,129 @@
 # AlienVault USM Sensor Deployment
 
 ## Table of Contents
-1. Introduction 
-2. Connecting the Sensor to AWS and The Running Assets
-3. Sensor Deployment
-4. Configuration of the Sensor
-5. Log Collection
+- [AlienVault USM Sensor Deployment](#alienvault-usm-sensor-deployment)
+  - [Table of Contents](#table-of-contents)
+- [1. Introduction](#1-introduction)
+- [2. Connecting the Sensor to AWS and The Running Assets](#2-connecting-the-sensor-to-aws-and-the-running-assets)
+- [3. Sensor Deployment](#3-sensor-deployment)
+    - [Sensor Connection](#sensor-connection)
+    - [Sensor Registration](#sensor-registration)
+- [4. USM Sensor Configuration](#4-usm-sensor-configuration)
+    - [AWS Log Collection](#aws-log-collection)
+    - [Log Management](#log-management)
+    - [Open Threat Exchange (OTX)](#open-threat-exchange-otx)
+- [5. Cloud Asset Log Ingestion](#5-cloud-asset-log-ingestion)
+    - [CloudWatch Agent Installation](#cloudwatch-agent-installation)
+    - [Log Group Verification](#log-group-verification)
+    - [Log Ingestion Confirmation](#log-ingestion-confirmation)
 
-# Introduction
+# 1. Introduction
 **Unified Security Management** (USM) is a cloud-native SaaS solution designed for rapid threat response. It goes beyond traditional SIEM by providing powerful threat and vulnerability detection across your environment. USM sensors deliver vital threat intelligence and integrate with multiple security tools. The platform automatically correlates all sensor data into actionable reports, alarms, and events, all of which are managed easily through your web browser.
 
-In this project, I will demonstrate how to deploy a USM Sensor and connect cloud-based assets to the sensor for log ingestion.
+This project demonstrates the process for deploying a USM Sensor within an AWS environment and configuring it to ingest logs from cloud-hosted assets.
 
-# Connecting the Sensor to AWS and The Running Assets
+# 2. Connecting the Sensor to AWS and The Running Assets
 
-In this example, my sensor is being hosted on AWS. Before starting I check to ensure that we are on the correct AWS server and that the asset as online. (Which we will be on us-east-2)
+The USM Sensor is deployed on an **Amazon Web Service**s (AWS) **EC2** instance, specifically in the `us-east-2 region`.
+
+Before deployment, all associated assets must be verified as running and accessible.
 
 ![alt text](<assets/Making sure to be on the correct AWS Server.png>)
 
-Here I am able to can confirm that my assets are properly running.
-
 ![alt text](<assets/Checking all instances are live.png>)
 
-# Sensor Deployment
+# 3. Sensor Deployment
 
-Visiting the **AWS Console** and going over to the **EC2** page, I am able to view my **Sensor** asset. This is where I was able to grab the public IP of the sensor. 
+### Sensor Connection
+1. Navigate to the AWS Console and locate the EC2 instance hosting the USM Sensor.
 
-In this example our sensor is being hosted on AWS; we will visit the sensor via the web browser.
+2. Retrieve the sensor's Public IPv4 Address to access the web-based setup utility.
 
 ![alt text](<assets/Connecting AWS logs by connecting my AWS instance with the IPv4 Public address.png>)
 
-From here we will need to launch the USMA wizard, this can be done by logging into your USMA instance with the credentials you inputted or were provided.
+1. Access the USM Sensor's web interface and log in with the provided credentials to launch the USMA wizard.
 
 ![alt text](<assets/Connecting to USMA.png>)
 
-We will click "**Get Started**" and here we will be provided with a **sensor code** that will connect your sensor to USM anywhere. (If you a code wasn't generated after clicking "**Get Started**", head over to the **Data Sources** section tab on the left hand side, and click "**New Sensor**").
+2. Click **"Get Started"** to generate a **unique sensor authentication code**. (If a code is not automatically generated, navigate to the **Data Sources** section in USM Anywhere and select "**New Sensor**").
 
-
+### Sensor Registration
 ![alt text](<assets/Configuring a new sensor by generating a sensor authentication code.png>)
 
-Return to your deployed sensor's **webpage** and enter in the details, follow the naming scheme that best fits your environment, for this example I identify our sensor **"USMA-TestSensor"**. 
+3. Return to the deployed sensor's webpage, enter the authentication code, and assign a descriptive name ( "**USMA-TestSensor**").
 
-Once all the fields are filled in, click "**Start Setup**" and wait for the Sensor Setup to be completed.
+4. Click "**Start Setup**" and wait for the sensor registration process to complete.
+
 
 ![alt text](<assets/Connecting to AWS Public sensor IP to intiate sensor connection to USMA with generated code.png>)
 
-# Configuration of the Sensor
+# 4. USM Sensor Configuration
 
-Head back over to **Data Sources** section tab on the left hand side and click "**Sensors**". Within your USMA instance you should see your newly deployed sensor. To configure our sensor we will head over to the wrench icon and open up the configuration wizard.
+The sensor’s logging and threat intelligence capabilities are configured via the USM Anywhere web console.
+
+1. In USM Anywhere, navigate to **Data Sources > Sensors**.
+
+2. Select the newly deployed sensor ("**USMA-TestSensor**") and open the configuration wizard via the wrench icon.
+
+3. Acknowledge any prompts regarding Network Intrusion Detection interfaces.
+
+   - If you have multiple NICs (Network Interface Cards), you'll need to select the one to use; however, for this example, only one is present. This might trigger a warning about Network Intrusion Detection interfaces, which you can safely dismiss by clicking OK.
 
 ![alt text](<assets/Configuring new sensor within USMA.png>)
 
-Depending on your resources you may have more than one NIC, but for my example I have only 1 NIC, this may prompt a warning about Network Intrusion Deteciton interfaces, you can proceed by clicking OK.
+### AWS Log Collection
 
-The first section will be **AWS Log Collection**
-
-For this example, We will be collecting logs from all sources besides Apache and IIS logs.
+In the **AWS Log Collection** section, specify the log sources to be ingested. For this project, all sources were selected except Apache and IIS logs.
 
 ![alt text](<assets/AWS Log Collection Settings.png>)
 
-Proceeding with the configuration, the next section was **Log Management**, we will have the system collect logs via syslog.
+### Log Management
 
-The next section is for the **Open Threat Exchange** section, this connects the sensor to LevelBlue's OTX platform, which provides users the ability to collaborate, research and receive alerts on emerging threats and indicators of compromise. 
+In the **Log Management** section, the system was configured to collect logs via **syslog**.
 
-In my setup, I setup the look-back to **unlimited**.
+### Open Threat Exchange (OTX)
+
+The **Open Threat Exchange** section connects the sensor to **LevelBlue's OTX platform**. This provides continuous, community-driven threat intelligence and Indicators of Compromise (IOCs).
+
+The look-back period for OTX pulses was configured to **unlimited**.
 
 ![alt text](<assets/Configuring sensor to collect OTX pulses.png>)
 
-After this, you may complete the wizard by clicking **Start Using USM Anywhere**. 
+Complete the wizard by clicking "**Start Using USM Anywhere**".
+
 
 ![alt text](<assets/19. USMA Sensor is now configured.png>)
 
-Heading back to the **Sensor** tab found within **Data Sources** I can now see that my sensor is properly configured, which is indicated by the green checkmark and is in the ready state.
+The sensor's successful configuration is verified by a green checkmark and a "**Ready**" status in the **Sensors** tab.
 
 ![alt text](<assets/confirmation of aws sensor configuration.png>)
 
-# Log Collection
+# 5. Cloud Asset Log Ingestion
 
-Now heading back into our AWS environment, I will be configuring my asset to send it's logs to CloudWatch. During the sensor configuration I configured the sensor to retrieve logs from CloudWatch.
+To finalize log collection, the target AWS asset must be configured to send its logs to an accessible collection point, which in this scenario is **CloudWatch**, since we just configured the USM Sensor to retrieve them.
 
-Remoting into my AWS asset, I install and launch the AWS CloudWatch agent via the CLI.
+### CloudWatch Agent Installation
+1. Remote connect to the target AWS asset.
+
+2. Install and launch the AWS CloudWatch agent using the Command Line Interface (**CLI**).
 
 ![alt text](<assets/13. installing cloudwatch agent.png>)
 
-AFter the Agent is successfully installed; I return to the **AWS Console** and search for **CloudWatch**. 
 
-Within **CloudWatch** I navigated to **Logs** and opened the Log Groups **Linux-Auth-Logs** and **OSQuery-Logs**, these logs are going to be sent from my asset, identified as **linux1**, and are being retrieved by the agent that was installed.
+### Log Group Verification
+1. Navigate to the **CloudWatch** service in the AWS Console.
 
-To confirm that the logs are properly being retrieved, I log back into **USM Anywhere** and head to the events section by going to **Activity** > **Events**.
+2. Verify the existence and population of the relevant Log Groups (**Linux-Auth-Logs** and **OSQuery-Logs**), which are now receiving data from the asset (**linux1**).
 
-Here we can see that the logs are being ingested within USMA.
+### Log Ingestion Confirmation
+
+To confirm successful log ingestion by USM Anywhere:
+
+1. Log into the USM Anywhere instance.
+
+2. Navigate to **Activity > Events**.
+
+The presence of the ingested logs confirms that the logs are being ingested from the asset's **CloudWatch** agent to the USM Anywhere.
 
 ![alt text](<assets/14. Receiving Linux logs from AWS Cloudwatch.png>)
 
